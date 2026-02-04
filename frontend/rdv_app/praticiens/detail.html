@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ praticien.user.get_full_name }} - Plateforme RDV{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Tableau de bord</a></li>
+                {% if user.role == 'admin' %}
+                <li class="breadcrumb-item"><a href="{% url 'praticiens_list' %}">Praticiens</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active">{{ praticien.user.get_full_name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Informations praticien -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                {% if praticien.photo %}
+                <img src="{{ praticien.photo.url }}" class="rounded-circle mb-3" width="150" height="150" alt="{{ praticien.user.get_full_name }}">
+                {% else %}
+                <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px; font-size: 3rem;">
+                    {{ praticien.user.first_name.0 }}{{ praticien.user.last_name.0 }}
+                </div>
+                {% endif %}
+                
+                <h3>{{ praticien.get_civilite_display }} {{ praticien.user.get_full_name }}</h3>
+                <p class="text-muted lead">{{ praticien.specialite }}</p>
+                
+                {% if praticien.actif %}
+                <span class="badge bg-success mb-3">
+                    <i class="bi bi-check-circle"></i> Actif
+                </span>
+                {% else %}
+                <span class="badge bg-danger mb-3">
+                    <i class="bi bi-x-circle"></i> Inactif
+                </span>
+                {% endif %}
+                
+                <hr>
+                
+                <div class="text-start">
+                    <p><i class="bi bi-telephone"></i> {{ praticien.telephone }}</p>
+                    <p><i class="bi bi-envelope"></i> {{ praticien.user.email }}</p>
+                    {% if praticien.numero_rpps %}
+                    <p><i class="bi bi-card-list"></i> RPPS: {{ praticien.numero_rpps }}</p>
+                    {% endif %}
+                </div>
+                
+                {% if user.role == 'admin' or user.praticien_profile.id == praticien.id %}
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{% url 'praticien_edit' praticien.id %}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    <a href="{% url 'praticien_planning' praticien.id %}" class="btn btn-success">
+                        <i class="bi bi-calendar3"></i> Voir le planning
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Horaires et indisponibilités -->
+    <div class="col-md-8">
+        <!-- Horaires de consultation -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock"></i> Horaires de consultation</h5>
+                {% if user.role == 'admin' or user.praticien_profile.id == praticien.id %}
+                <a href="{% url 'horaire_create' praticien.id %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus"></i> Ajouter
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if horaires %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Jour</th>
+                                <th>Heure de début</th>
+                                <th>Heure de fin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for horaire in horaires %}
+                            <tr>
+                                <td><strong>{{ horaire.get_jour_semaine_display }}</strong></td>
+                                <td>{{ horaire.heure_debut }}</td>
+                                <td>{{ horaire.heure_fin }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Aucun horaire défini</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Indisponibilités -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-calendar-x"></i> Indisponibilités à venir</h5>
+                {% if user.role == 'admin' or user.praticien_profile.id == praticien.id %}
+                <a href="{% url 'indisponibilite_create' praticien.id %}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-plus"></i> Ajouter
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if indisponibilites %}
+                <div class="list-group">
+                    {% for indispo in indisponibilites %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ indispo.motif }}</h6>
+                            <small>{{ indispo.date_debut|date:"d/m/Y" }} - {{ indispo.date_fin|date:"d/m/Y" }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Aucune indisponibilité prévue</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
