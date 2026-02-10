@@ -1,0 +1,11 @@
+{
+  "name": "plateforme-rdv-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Plateforme RDV",
+  "scripts": {
+    "start": "echo 'Frontend placeholder - add your framework here'",
+    "build": "echo 'Build command here'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} un praticien - Plateforme RDV{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-6">
+            <i class="bi bi-person-badge"></i> {{ action }} un praticien
+        </h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Tableau de bord</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'praticiens_list' %}">Praticiens</a></li>
+                <li class="breadcrumb-item active">{{ action }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Informations du praticien</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <h6 class="text-primary mb-3">Informations utilisateur</h6>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nom d'utilisateur</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Prénom</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nom</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <div class="text-danger small">{{ form.password.errors }}</div>
+                        {% endif %}
+                        <small class="text-muted">Laisser vide pour ne pas modifier</small>
+                    </div>
+                    
+                    <hr class="my-4">
+                    <h6 class="text-primary mb-3">Informations professionnelles</h6>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Civilité</label>
+                            {{ form.civilite }}
+                            {% if form.civilite.errors %}
+                                <div class="text-danger small">{{ form.civilite.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Spécialité</label>
+                            {{ form.specialite }}
+                            {% if form.specialite.errors %}
+                                <div class="text-danger small">{{ form.specialite.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Numéro RPPS</label>
+                            {{ form.numero_rpps }}
+                            {% if form.numero_rpps.errors %}
+                                <div class="text-danger small">{{ form.numero_rpps.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Téléphone</label>
+                            {{ form.telephone }}
+                            {% if form.telephone.errors %}
+                                <div class="text-danger small">{{ form.telephone.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Photo</label>
+                        {{ form.photo }}
+                        {% if form.photo.errors %}
+                            <div class="text-danger small">{{ form.photo.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.actif }}
+                            <label class="form-check-label" for="{{ form.actif.id_for_label }}">
+                                Praticien actif
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'praticiens_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> {{ action }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter un horaire - Plateforme RDV{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-6">
+            <i class="bi bi-clock"></i> Ajouter un horaire pour {{ praticien.user.get_full_name }}
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Jour de la semaine</label>
+                        {{ form.jour_semaine }}
+                        {% if form.jour_semaine.errors %}
+                            <div class="text-danger small">{{ form.jour_semaine.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Heure de début</label>
+                        {{ form.heure_debut }}
+                        {% if form.heure_debut.errors %}
+                            <div class="text-danger small">{{ form.heure_debut.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Heure de fin</label>
+                        {{ form.heure_fin }}
+                        {% if form.heure_fin.errors %}
+                            <div class="text-danger small">{{ form.heure_fin.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'praticien_detail' praticien.id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Ajouter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

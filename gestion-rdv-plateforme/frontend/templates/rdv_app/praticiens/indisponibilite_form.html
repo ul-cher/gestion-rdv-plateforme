@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter une indisponibilité - Plateforme RDV{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-6">
+            <i class="bi bi-calendar-x"></i> Ajouter une indisponibilité pour {{ praticien.user.get_full_name }}
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Date de début</label>
+                        {{ form.date_debut }}
+                        {% if form.date_debut.errors %}
+                            <div class="text-danger small">{{ form.date_debut.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Date de fin</label>
+                        {{ form.date_fin }}
+                        {% if form.date_fin.errors %}
+                            <div class="text-danger small">{{ form.date_fin.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Motif</label>
+                        {{ form.motif }}
+                        {% if form.motif.errors %}
+                            <div class="text-danger small">{{ form.motif.errors }}</div>
+                        {% endif %}
+                        <small class="text-muted d-block">Ex: Congés, Formation, Urgence</small>
+                    </div>
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'praticien_detail' praticien.id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-check-circle"></i> Ajouter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord - Plateforme RDV{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5">
+            <i class="bi bi-speedometer2"></i> Tableau de bord
+        </h1>
+        <p class="lead text-muted">Bienvenue {{ user.get_full_name }} - {{ user.get_role_display }}</p>
+    </div>
+</div>
+
+{% if user.role == 'admin' %}
+<!-- Admin Dashboard -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card stat-card info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Rendez-vous</h6>
+                        <h2 class="mb-0">{{ total_rdv }}</h2>
+                    </div>
+                    <div class="text-info">
+                        <i class="bi bi-calendar-check" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">RDV Aujourd'hui</h6>
+                        <h2 class="mb-0">{{ rdv_aujourdhui }}</h2>
+                    </div>
+                    <div class="text-success">
+                        <i class="bi bi-calendar-day" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Patients</h6>
+                        <h2 class="mb-0">{{ total_patients }}</h2>
+                    </div>
+                    <div class="text-warning">
+                        <i class="bi bi-people" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Annulations</h6>
+                        <h2 class="mb-0">{{ annulations_attente }}</h2>
+                    </div>
+                    <div class="text-danger">
+                        <i class="bi bi-x-circle" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Rendez-vous récents</h5>
+            </div>
+            <div class="card-body">
+                {% if rdv_recents %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date/Heure</th>
+                                <th>Patient</th>
+                                <th>Praticien</th>
+                                <th>Motif</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rdv in rdv_recents %}
+                            <tr>
+                                <td>{{ rdv.date_heure|date:"d/m/Y H:i" }}</td>
+                                <td>{{ rdv.patient.user.get_full_name }}</td>
+                                <td>{{ rdv.praticien.user.get_full_name }}</td>
+                                <td>{{ rdv.motif|truncatewords:5 }}</td>
+                                <td>
+                                    <span class="badge bg-{% if rdv.statut == 'confirme' %}success{% elif rdv.statut == 'en_attente' %}warning{% elif rdv.statut == 'annule' %}danger{% else %}secondary{% endif %}">
+                                        {{ rdv.get_statut_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'rdv_detail' rdv.id %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Aucun rendez-vous récent</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.role == 'praticien' %}
+<!-- Praticien Dashboard -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-day"></i> Rendez-vous d'aujourd'hui</h5>
+            </div>
+            <div class="card-body">
+                {% if rdv_aujourdhui %}
+                <div class="list-group">
+                    {% for rdv in rdv_aujourdhui %}
+                    <a href="{% url 'rdv_detail' rdv.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ rdv.date_heure|date:"H:i" }} - {{ rdv.patient.user.get_full_name }}</h6>
+                            <span class="badge bg-{% if rdv.statut == 'confirme' %}success{% else %}warning{% endif %}">
+                                {{ rdv.get_statut_display }}
+                            </span>
+                        </div>
+                        <p class="mb-1 text-muted small">{{ rdv.motif|truncatewords:10 }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Aucun rendez-vous aujourd'hui</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-week"></i> Prochains rendez-vous (7 jours)</h5>
+            </div>
+            <div class="card-body">
+                {% if rdv_semaine %}
+                <div class="list-group">
+                    {% for rdv in rdv_semaine|slice:":5" %}
+                    <a href="{% url 'rdv_detail' rdv.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ rdv.date_heure|date:"d/m/Y H:i" }}</h6>
+                            <span class="badge bg-{% if rdv.statut == 'confirme' %}success{% else %}warning{% endif %}">
+                                {{ rdv.get_statut_display }}
+                            </span>
+                        </div>
+                        <p class="mb-1">{{ rdv.patient.user.get_full_name }}</p>
+                        <p class="mb-0 text-muted small">{{ rdv.motif|truncatewords:8 }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Aucun rendez-vous prévu</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="text-center">
+            <a href="{% url 'praticien_planning' praticien.id %}" class="btn btn-primary btn-lg me-2">
+                <i class="bi bi-calendar3"></i> Voir mon planning
+            </a>
+            <a href="{% url 'rendez_vous_list' %}" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-list"></i> Tous les rendez-vous
+            </a>
+        </div>
+    </div>
+</div>
+
+{% elif user.role == 'patient' %}
+<!-- Patient Dashboard -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-plus"></i> Mes prochains rendez-vous</h5>
+            </div>
+            <div class="card-body">
+                {% if rdv_futurs %}
+                <div class="list-group">
+                    {% for rdv in rdv_futurs %}
+                    <a href="{% url 'rdv_detail' rdv.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ rdv.date_heure|date:"d/m/Y à H:i" }}</h6>
+                            <span class="badge bg-{% if rdv.statut == 'confirme' %}success{% else %}warning{% endif %}">
+                                {{ rdv.get_statut_display }}
+                            </span>
+                        </div>
+                        <p class="mb-1">{{ rdv.praticien.get_civilite_display }} {{ rdv.praticien.user.get_full_name }}</p>
+                        <p class="mb-0 text-muted small">{{ rdv.praticien.specialite }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">Aucun rendez-vous prévu</p>
+                    <a href="{% url 'rendez_vous_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Prendre un rendez-vous
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historique récent</h5>
+            </div>
+            <div class="card-body">
+                {% if rdv_passes %}
+                <div class="list-group">
+                    {% for rdv in rdv_passes %}
+                    <a href="{% url 'rdv_detail' rdv.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ rdv.date_heure|date:"d/m/Y à H:i" }}</h6>
+                        </div>
+                        <p class="mb-1">{{ rdv.praticien.get_civilite_display }} {{ rdv.praticien.user.get_full_name }}</p>
+                        <p class="mb-0 text-muted small">{{ rdv.praticien.specialite }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Aucun historique</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="text-center">
+            <a href="{% url 'rendez_vous_create' %}" class="btn btn-primary btn-lg me-2">
+                <i class="bi bi-plus-circle"></i> Prendre un rendez-vous
+            </a>
+            <a href="{% url 'rendez_vous_list' %}" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-list"></i> Voir tous mes rendez-vous
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

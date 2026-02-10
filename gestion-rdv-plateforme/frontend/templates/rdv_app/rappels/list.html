@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des Rappels - Plateforme RDV{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-6">
+            <i class="bi bi-bell"></i> Gestion des rappels automatiques
+        </h1>
+        <p class="text-muted">Liste des rappels envoyés aux patients avant leurs rendez-vous</p>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="btn-group" role="group">
+            <a href="?envoye=false" class="btn btn-outline-warning">
+                <i class="bi bi-hourglass"></i> En attente
+            </a>
+            <a href="?envoye=true" class="btn btn-outline-success">
+                <i class="bi bi-check-circle"></i> Envoyés
+            </a>
+            <a href="?" class="btn btn-outline-secondary">
+                <i class="bi bi-list"></i> Tous
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des rappels -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% if rappels %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Rendez-vous</th>
+                                <th>Patient</th>
+                                <th>Praticien</th>
+                                <th>Type</th>
+                                <th>Date prévue</th>
+                                <th>Date envoi</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rappel in rappels %}
+                            <tr>
+                                <td>{{ rappel.rdv.date_heure|date:"d/m/Y H:i" }}</td>
+                                <td>{{ rappel.rdv.patient.user.get_full_name }}</td>
+                                <td>{{ rappel.rdv.praticien.user.get_full_name }}</td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ rappel.get_type_rappel_display }}
+                                    </span>
+                                </td>
+                                <td>{{ rappel.date_envoi_prevue|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if rappel.date_envoi_effectif %}
+                                        {{ rappel.date_envoi_effectif|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if rappel.envoye %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Envoyé
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-hourglass"></i> En attente
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> Aucun rappel trouvé
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> 
+            <strong>Information:</strong> Les rappels sont envoyés automatiquement 48h et 24h avant chaque rendez-vous confirmé.
+            Dans cette version de démonstration, les envois sont simulés.
+        </div>
+    </div>
+</div>
+{% endblock %}
+

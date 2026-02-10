@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Planning - {{ praticien.user.get_full_name }} - Plateforme RDV{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6">
+                    <i class="bi bi-calendar3"></i> Planning de {{ praticien.user.get_full_name }}
+                </h1>
+                <p class="text-muted">{{ praticien.specialite }}</p>
+            </div>
+            <a href="{% url 'praticien_detail' praticien.id %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-week"></i> 
+                    Semaine du {{ week_start|date:"d/m/Y" }}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if rdv_semaine %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Heure</th>
+                                <th>Patient</th>
+                                <th>Motif</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rdv in rdv_semaine %}
+                            <tr>
+                                <td>{{ rdv.date_heure|date:"d/m/Y" }}</td>
+                                <td><strong>{{ rdv.date_heure|date:"H:i" }}</strong></td>
+                                <td>{{ rdv.patient.user.get_full_name }}</td>
+                                <td>{{ rdv.motif|truncatewords:5 }}</td>
+                                <td>
+                                    <span class="badge bg-{% if rdv.statut == 'confirme' %}success{% elif rdv.statut == 'en_attente' %}warning{% elif rdv.statut == 'annule' %}danger{% else %}secondary{% endif %}">
+                                        {{ rdv.get_statut_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'rdv_detail' rdv.id %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if rdv.statut == 'en_attente' %}
+                                    <a href="{% url 'rdv_confirmer' rdv.id %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-check"></i> Confirmer
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">Aucun rendez-vous prévu cette semaine</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
